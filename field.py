@@ -17,7 +17,7 @@ class Field:
 
     def __init__(self):
         self.tile_size = 100    # размер костяшки
-        self.slit = 8           # размер зазора между костяшками
+        self.slit = 6           # размер зазора между костяшками
         
         # отступы от края экрана, откуда начинаем расставлять костяшки
         self.tiles_start_x = 20
@@ -44,18 +44,21 @@ class Field:
 
         # анимация
         self.animating = False  # анимируется
-        self.speed = 5          # скорость смещения
+        self.speed = 7          # скорость смещения
         self.diff_x = 0  # смещение по оси X в пикселях
         self.diff_y = 0  # смещение по оси Y в пикселях
 
         self.shuffle()
 
     def shuffle(self):
+        pass
      # todo переписать
         self.right(2)
         self.down(1)
         self.left(4)
         self.up(2)
+
+        self.animation_end()
 
     # возвращает изображения костяшек с массивом координат для отрисовки в пикселях
     # вычисление координат можно вынести в отдельный метод calc_coords()
@@ -71,15 +74,47 @@ class Field:
 
         return out
 
-    def animation(self):
-        self.diff_y = self.diff_y + self.speed
-        #for tile in self.tiles
+    def animation_start(self, direction):
+        diff = self.tile_size + self.speed
 
-    def animation_start(self):
-        pass
+        if direction == "done":
+            self.diff_y = diff * (-1)
+        elif direction == "up":
+            self.diff_y = diff
+        elif direction == "right":
+            self.diff_x = diff * (-1)
+        elif direction == "left":
+            self.diff_x = diff
+        else:
+            print("Direction Error")
+
+        self.animating = True
+
+    def animation(self):
+        if (
+            abs(self.diff_x) <= self.speed
+            and
+            abs(self.diff_y) <= self.speed
+        ):
+            self.animation_end()
+
+        if self.diff_x != 0:
+            if self.diff_x > 0:
+                self.diff_x = self.diff_x - self.speed
+            elif self.diff_x < 0:
+                self.diff_x = self.diff_x + self.speed
+        elif self.diff_y != 0:
+            if self.diff_y > 0:
+                self.diff_y = self.diff_y - self.speed
+            elif self.diff_y < 0:
+                self.diff_y = self.diff_y + self.speed
 
     def animation_end(self):
-        pass
+        self.diff_x = 0
+        self.diff_y = 0
+        self.animating = False
+        for tile in self.tiles:
+            tile.animate = False
 
     # возвращает массив координат для отрисовки костяшки
     def calc_coords(self, tile):
@@ -87,10 +122,16 @@ class Field:
         x = (x_pos - 1) * self.tile_size + self.tiles_start_x + (x_pos - 1) * self.slit
         y_pos = tile.y
         y = (y_pos - 1) * self.tile_size + self.tiles_start_y + (y_pos - 1) * self.slit
+
+        if tile.animate == True:
+            x = x + self.diff_x
+            y = y + self.diff_y
+
         return [x, y]
 
     # смещение костяшек вниз
     def down(self, y_pos):
+        self.animation_start("done")
         count = self.space_y - y_pos
         for tile in self.tiles:
             if tile.x == self.space_x and y_pos <= tile.y and tile.y < self.space_y:
@@ -99,6 +140,7 @@ class Field:
 
     # смещение костяшек вверх
     def up(self, y_pos):
+        self.animation_start("up")
         count = y_pos - self.space_y
         for tile in self.tiles:
             if tile.x == self.space_x and y_pos >= tile.y and tile.y > self.space_y:
@@ -107,6 +149,7 @@ class Field:
 
     # смещение костяшек вправо
     def right(self, x_pos):
+        self.animation_start("right")
         count = self.space_x - x_pos
         for tile in self.tiles:
             if tile.y == self.space_y and x_pos <= tile.x and tile.x < self.space_x:
@@ -115,6 +158,7 @@ class Field:
 
     # смещение костяшек влево
     def left(self, x_pos):
+        self.animation_start("left")
         count = x_pos - self.space_x
         for tile in self.tiles:
             if tile.y == self.space_y and x_pos >= tile.x and tile.x > self.space_x:
@@ -154,7 +198,8 @@ class Field:
 
     def turn_accessibility(self, x_pos, y_pos):
         if (
-            x_pos < 1 or x_pos > 4 or y_pos < 1 or y_pos > 4
+            self.animating == True
+            or x_pos < 1 or x_pos > 4 or y_pos < 1 or y_pos > 4
             or (self.space_x == x_pos and self.space_y == y_pos)
             or (self.space_x != x_pos and self.space_y != y_pos)
         ):
