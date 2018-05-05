@@ -1,3 +1,4 @@
+import os.path
 import pygame
 
 
@@ -6,7 +7,9 @@ class Tile:
         self.number = number  # имя костяшки 1-15
         
         # загружаем изображение костяшки исходя из её имени
-        self.image = pygame.image.load("./data/" + str(number) + ".png")
+        file_name = str(number) + '.png'
+        file_path = os.path.join('data', file_name)
+        self.image = pygame.image.load(file_path)
 
         # устанавливаем стартовую позицию костяшки
         self.x = start_x
