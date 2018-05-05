@@ -1,12 +1,14 @@
-
-#  1  2  3  4
-#  5  6  7  8
-#  9 10 11 12
-# 13 14 15  0
-
+# начальное размещение
+#   1     2     3     4
 # [1,1] [2,1] [3,1] [4,1]
+#
+#   5     6     7     8
 # [1,2] [2,2] [3,2] [4,2]
+#
+#   9    10    11    12
 # [1,3] [2,3] [3,3] [4,3]
+#
+#  13    14    15    x
 # [1,4] [2,4] [3,4] [4,4]
 
 import random
@@ -17,7 +19,7 @@ class Field:
 
     def __init__(self):
         self.tile_size = 100    # размер костяшки
-        self.slit = 6           # размер зазора между костяшками
+        self.slit = 5           # размер зазора между костяшками
         
         # отступы от края экрана, откуда начинаем расставлять костяшки
         self.tiles_start_x = 20
@@ -27,26 +29,28 @@ class Field:
         self.space_x = 4
         self.space_y = 4
 
-        self.tiles = []                         # массив костяшек
+        # массив костяшек...
+        self.tiles = []
+
+        # ...заполняем
         number = 1
         y = 1
-        while(y < 5):
+        while y < 5:
             x = 1
-            while(x < 5):
+            while x < 5:
                 if number < 16:
                     tile = Tile(number, x, y)
                     self.tiles.append(tile)
-                    # print(number, x, y)
                 number = number + 1
                 x = x + 1
 
             y = y + 1
 
-        # анимация
+        # свойства используемые для анимации
         self.animating = False  # анимируется
-        self.speed = 7          # скорость смещения
-        self.diff_x = 0  # смещение по оси X в пикселях
-        self.diff_y = 0  # смещение по оси Y в пикселях
+        self.speed = 15         # скорость смещения
+        self.diff_x = 0         # смещение по оси X в пикселях
+        self.diff_y = 0         # смещение по оси Y в пикселях
 
         self.shuffle()
 
@@ -60,8 +64,7 @@ class Field:
 
         self.animation_end()
 
-    # возвращает изображения костяшек с массивом координат для отрисовки в пикселях
-    # вычисление координат можно вынести в отдельный метод calc_coords()
+    # возвращает необходимую для отрисовки костяшек информацию
     # [
     #   {'image': image, 'coords': [x, y]},
     #   ...
@@ -69,7 +72,10 @@ class Field:
     def get_tiles_for_draw(self):
         out = []
         for tile in self.tiles:
-            info_for_draw = {'image': tile.image, 'coords': self.calc_coords(tile)}
+            info_for_draw = {
+                'image': tile.image,
+                'coords': self.calc_coords(tile)
+            }
             out.append(info_for_draw)
 
         return out
@@ -166,10 +172,10 @@ class Field:
         self.space_x = self.space_x + count
 
 
-    # метод получает координаты клика мышкой - coords
-    # должен получить позицию костяшки в которую попал игрок (можно вынести в отдельный метод calc_tile_pos())
+    # метод получает координаты клика мышкой - coords (кортеж)
+    # получает позицию костяшки в которую попал игрок (calc_tile_pos())
     # и если возможно сделать передвижение костяшек,
-    # то должен запустить перемещение используя методы: down(), up(), right(), left()
+    # то запускает перемещение используя методы: down(), up(), right(), left()
     def try_turn(self, coords):
         x_pos, y_pos = self.calc_tile_pos(coords)
         if self.turn_accessibility(x_pos, y_pos) != True:
@@ -208,7 +214,8 @@ class Field:
             return True
 
     # проверяет не выиграл ли игрок
-    # для этого перебираем все костяшки и сравниваем их текущую позицию с победной позицией (win_x, win_y)
+    # для этого перебираем все костяшки и сравниваем их текущую позицию
+    # с победной позицией (win_x, win_y)
     def check_win(self):
         for tile in self.tiles:
             if not tile.in_win_position():

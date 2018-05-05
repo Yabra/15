@@ -3,34 +3,31 @@
 
 # импортируем необходимые библиотеки
 import pygame
-import random
-# import time
-from pygame import time
 
-# импортируем наши классы поля, и костяшек
+# импортируем наш класс поля
 from field import Field
-from tile import Tile
 
-pygame.init()                                   # инициация PyGame, обязательная строчка
+# инициация PyGame, обязательная строчка
+pygame.init()
 
 # объявляем переменные, которые будем использовать в программе
-field = Field()                 # создаём поле
-display_size = field.get_size()  # группируем ширину и высоту в одну переменную
-back_color = "#000000"          # цвет фона
+field = Field()                  # создаём поле
+display_size = field.get_size()  # размеры окна
+back_color = "#000000"           # цвет фона
 
 screen = pygame.display.set_mode(display_size)  # создаем окно программы
 pygame.display.set_caption("Пятнашки")          # название окна
 background = pygame.Surface(display_size)       # создание видимой поверхности, будем использовать как фон
 background.fill(pygame.Color(back_color))       # заливаем поверхность сплошным цветом
 
-#field.shuffle_start()          # перемешиваем костяшки
-
 fps = 25                        # задаём количество кадров в секунду
 fpsclock = pygame.time.Clock()  # создаём объект который контролирует количество кадров в секунду
 
-# cc = 0
 running = True
-while running:                          # основной цикл программы
+
+# основной цикл программы
+while running:
+
     for event in pygame.event.get():        # обрабатываем события
         if event.type == pygame.QUIT:           # событие нажатия на крестик (закрытие окна)
             running = False                         # выходим из программы
@@ -40,31 +37,19 @@ while running:                          # основной цикл програ
             print("true")
             field.shuffle()
 
-#    if not field.animating and field.shuffling:
-#        field.shuffle()
-
     field.animation()
 
-    # отрисовываем все элементы игры, начиная с фона, каждую итерацию необходимо всё перерисовывать
-    screen.blit(background, (0, 0))                 # фон
-    
+    # отрисовываем все элементы игры, начиная с фона,
+    # каждую итерацию необходимо всё перерисовывать...
+    # ...фон
+    screen.blit(background, (0, 0))
+
+    # ...костяшки
     for info in field.get_tiles_for_draw():
-        screen.blit(info['image'], info['coords'])  # костяшки
+        screen.blit(info['image'], info['coords'])
 
-    # отладка
-    # if not field.animating:
-    # if cc == 0:
-    #     field.tiles[14].right()
-    # elif cc == 1:
-    #     field.right(3)
-    # elif cc == 2:
-    #     field.up(2)
-    # elif cc == 3:
-    #     field.left(1)
-    # elif cc == 4:
-    #     running = False
+    # обновление и вывод всех изменений на экран
+    pygame.display.update()
 
-    # cc += 1
-
-    pygame.display.update()         # обновление и вывод всех изменений на экран
-    fpsclock.tick(fps)              # контроль за количеством кадров в секунду
+    # контроль за количеством кадров в секунду
+    fpsclock.tick(fps)
