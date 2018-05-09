@@ -54,15 +54,66 @@ class Field:
 
         self.shuffle()
 
-    def shuffle(self):
-        pass
-     # todo переписать
+    # перемешивание костяшек для тестирования
+    def shuffle_test(self):
         self.right(2)
         self.down(1)
         self.left(4)
         self.up(2)
 
         self.animation_end()
+
+    # перемешивание костяшек
+    def shuffle(self):
+
+        # повторяем операции перемешивания 1000 раз
+        for __ in range(0, 1000):
+
+            # список доступных направлений движения костяшек
+            possible_directions = []
+
+            if self.space_y > 1:
+                possible_directions.append(self.down)
+
+            if self.space_y < 4:
+                possible_directions.append(self.up)
+
+            if self.space_x > 1:
+                possible_directions.append(self.right)
+
+            if self.space_x < 4:
+                possible_directions.append(self.left)
+
+            # выбираем случайное направление из доступных
+            direction = random.choice(possible_directions)
+
+            # выбираем случайную позицию для смещения из доступных
+            position = self.get_rnd_position_for_move(direction.__name__)
+
+            # двигаем костяшки
+            direction(position)
+
+        self.animation_end()
+
+    # возвращает случайную позицию для смещения из доступных
+    # исходя из направления движения
+    def get_rnd_position_for_move(self, direction):
+        if direction == "down":
+            min = 1
+            max = self.space_y - 1
+        elif direction == "up":
+            min = self.space_y + 1
+            max = 4
+        elif direction == "right":
+            min = 1
+            max = self.space_x - 1
+        elif direction == "left":
+            min = self.space_x + 1
+            max = 4
+        else:
+            print("Direction Error")
+
+        return random.randint(min, max)
 
     # возвращает необходимую для отрисовки костяшек информацию
     # [
