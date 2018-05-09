@@ -83,7 +83,7 @@ class Field:
     def animation_start(self, direction):
         diff = self.tile_size + self.speed
 
-        if direction == "done":
+        if direction == "down":
             self.diff_y = diff * (-1)
         elif direction == "up":
             self.diff_y = diff
@@ -137,7 +137,7 @@ class Field:
 
     # смещение костяшек вниз
     def down(self, y_pos):
-        self.animation_start("done")
+        self.animation_start("down")
         count = self.space_y - y_pos
         for tile in self.tiles:
             if tile.x == self.space_x and y_pos <= tile.y and tile.y < self.space_y:
