@@ -17,7 +17,7 @@ from tile import Tile
 
 class Field:
 
-    def __init__(self):
+    def __init__(self, config):
         self.tile_size = 100    # размер костяшки
         self.slit = 5           # размер зазора между костяшками
         
@@ -48,11 +48,15 @@ class Field:
 
         # свойства используемые для анимации
         self.animating = False  # анимируется
-        self.speed = 15         # скорость смещения
-        self.diff_x = 0         # смещение по оси X в пикселях
-        self.diff_y = 0         # смещение по оси Y в пикселях
+        self.speed = config.getint('animating_speed')  # скорость смещения
+        self.diff_x = 0  # смещение по оси X в пикселях
+        self.diff_y = 0  # смещение по оси Y в пикселях
 
-        self.shuffle()
+        if config.getboolean('shuffle_test') is True:
+            self.shuffle_test()
+        else:
+            shuffle_count = config.getint('shuffle_count')
+            self.shuffle(shuffle_count)
 
     # перемешивание костяшек для тестирования
     def shuffle_test(self):
@@ -64,10 +68,10 @@ class Field:
         self.animation_end()
 
     # перемешивание костяшек
-    def shuffle(self):
+    def shuffle(self, shuffle_count):
 
         # повторяем операции перемешивания 1000 раз
-        for __ in range(0, 1000):
+        for __ in range(0, shuffle_count):
 
             # список доступных направлений движения костяшек
             possible_directions = []
