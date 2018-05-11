@@ -47,7 +47,7 @@ while running:
     screen.blit(background, (0, 0))
 
     # ...костяшки
-    for info in field.get_tiles_for_draw():
+    for info in field.get_images_for_draw():
         screen.blit(info['image'], info['coords'])
 
     # обновление и вывод всех изменений на экран

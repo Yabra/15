@@ -11,6 +11,8 @@
 #  13    14    15    x
 # [1,4] [2,4] [3,4] [4,4]
 
+import os
+import pygame
 import random
 from tile import Tile
 
@@ -28,6 +30,10 @@ class Field:
         # начальная позиция дырки
         self.space_x = 4
         self.space_y = 4
+
+        self.win = False
+        win_image_path = os.path.join('data', 'win.png')
+        self.win_image = pygame.image.load(win_image_path)
 
         # массив костяшек...
         self.tiles = []
@@ -118,6 +124,21 @@ class Field:
             print("Direction Error")
 
         return random.randint(min, max)
+
+    def get_images_for_draw(self):
+        if (
+            self.win is True
+            and self.animating is not True
+        ):
+            return self.win_for_draw()
+        else:
+            return self.get_tiles_for_draw()
+
+    def win_for_draw(self):
+        return [{
+            'image': self.win_image,
+            'coords': [self.tiles_start_x, self.tiles_start_y]
+        }]
 
     # возвращает необходимую для отрисовки костяшек информацию
     # [
@@ -248,7 +269,7 @@ class Field:
                 self.right(x_pos)
 
         if self.check_win():
-            self.win()
+            self.win_action()
 
     def calc_tile_pos(self, coords):
         x = coords[0]
@@ -259,7 +280,8 @@ class Field:
 
     def turn_accessibility(self, x_pos, y_pos):
         if (
-            self.animating == True
+            self.win == True
+            or self.animating == True
             or x_pos < 1 or x_pos > 4 or y_pos < 1 or y_pos > 4
             or (self.space_x == x_pos and self.space_y == y_pos)
             or (self.space_x != x_pos and self.space_y != y_pos)
@@ -283,5 +305,5 @@ class Field:
         size_y = self.tile_size * 4 + self.slit * 3 + self.tiles_start_y * 2
         return (size_x, size_y)
 
-    def win(self):
-        print("You are win!")
+    def win_action(self):
+        self.win = True
